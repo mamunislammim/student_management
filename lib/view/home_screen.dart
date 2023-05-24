@@ -63,8 +63,9 @@ class _HomePageState extends State<HomePage> {
                 height: 10,
               ),
               GridView.builder(
+                physics: const BouncingScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: 12,
+                itemCount: 50,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
                     crossAxisSpacing: 3.0,
