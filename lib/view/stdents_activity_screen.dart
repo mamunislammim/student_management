@@ -1,14 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:student_management/controller/get_data_on_firebase.dart';
 import 'package:student_management/widget/image_seen_screen.dart';
 
 class StudentsActivityScreen extends StatefulWidget {
-  const StudentsActivityScreen({Key? key}) : super(key: key);
-
+  const StudentsActivityScreen(
+      {Key? key,
+      required this.uid,
+      required this.email,
+      required this.institute,
+      required this.name,
+        required this.img,
+      required this.phn})
+      : super(key: key);
+  final String uid;
+  final String name;
+  final String email;
+  final String institute;
+  final String phn;
+  final String img;
   @override
   State<StudentsActivityScreen> createState() => _StudentsActivityScreenState();
 }
 
 class _StudentsActivityScreenState extends State<StudentsActivityScreen> {
+  String? name;
+  String? email;
+  String? phn;
+  String? institute;
+  String? img;
+  String? uid;
+  @override
+  void initState() {
+    uid = widget.uid;
+    name = widget.name;
+    email = widget.email;
+    phn = widget.phn;
+     institute = widget.institute;
+    img = widget.img;
+    setState(() {});
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -35,41 +68,48 @@ class _StudentsActivityScreenState extends State<StudentsActivityScreen> {
                       ),
                     ),
                   ),
-                  const Positioned(
+                  Positioned(
                       bottom: -50,
                       left: 10,
                       child: CircleAvatar(
                         radius: 50,
-                        backgroundImage: NetworkImage(
-                            "https://scontent.fdac20-1.fna.fbcdn.net/v/t39.30808-6/331153809_723316119531111_3314194278158821126_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=09cbfe&_nc_eui2=AeF31UgJSGlRs-PuqA3hJY279NJsU9sIpUv00mxT2wilSzlVOaZWJkDoUCONbr-C0E3BzEQlLFIEl66X3nCKIPWZ&_nc_ohc=45rQzsJsYYcAX9QfZtp&_nc_ht=scontent.fdac20-1.fna&oh=00_AfDSQDhH8D_f_MqoLHJRDwlAtvBrNxkbsVcMHvyFsJCHrA&oe=6473372E"),
+                        backgroundImage: img != null
+                            ? NetworkImage(img.toString())
+                            : const NetworkImage(
+                                "https://w7.pngwing.com/pngs/340/946/png-transparent-avatar-user-computer-icons-software-developer-avatar-child-face-heroes-thumbnail.png"),
                       )),
                   Positioned(
-                      top: (size.height * .17),
-                      left: (size.width * .33),
-                      child: const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Mamun Islam Mim",
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20),
-                          ),
-                          Text(
-                            "Flutter Software Developer",
-                            style: TextStyle(color: Colors.black, fontSize: 15),
-                          ),
-                          // Text(
-                          //   "Mamun Islam Mim",
-                          //   style: TextStyle(
-                          //       color: Colors.black,
-                          //       fontWeight: FontWeight.bold,
-                          //       fontSize: 20),
-                          // ),
-                        ],
-                      ))
+                    top: (size.height * .17),
+                    left: (size.width * .33),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          name.toString(),
+                          style: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20),
+                        ),
+                        Text(
+                          institute.toString(),
+                          style: const TextStyle(
+                              color: Colors.black, fontSize: 15),
+                        ),
+                        Text(
+                          email.toString(),
+                          style: const TextStyle(
+                              color: Colors.black, fontSize: 15),
+                        ),
+                        Text(
+                          "Phone : ${phn.toString()}",
+                          style: const TextStyle(
+                              color: Colors.black, fontSize: 15),
+                        ),
+                      ],
+                    ),
+                  )
                 ],
               ),
               SizedBox(
@@ -77,7 +117,7 @@ class _StudentsActivityScreenState extends State<StudentsActivityScreen> {
               ),
               Card(
                 color: Colors.blueGrey.shade100,
-                child: Row(
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Padding(
@@ -94,46 +134,76 @@ class _StudentsActivityScreenState extends State<StudentsActivityScreen> {
                   ],
                 ),
               ),
-              GridView.builder(
-                padding: const EdgeInsets.only(left: 5, right: 5),
-                physics: const BouncingScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: 20,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  childAspectRatio: .77,
-                  crossAxisCount: 3,
-                ),
-                itemBuilder: (BuildContext context, int index) {
-                  return Card(
-                    color: Colors.grey.shade300,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ImageSeen()));
-                          },
-                          child: Container(
-                            height: 120,
-                            decoration: const BoxDecoration(
-                              image: DecorationImage(
-                                image: NetworkImage(
-                                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJNZW4BLBsUQy32kokD21__zw0E1b6e3S8vHkQstNqnziy4kv-CXN2PG4NkLOERIye90M&usqp=CAU'),
-                                fit: BoxFit.fill,
-                              ),
-                            ),
-                          ),
+              FutureBuilder(
+                  future: GetAllData().getInformation(widget.uid),
+                  builder: (_, snapshots) {
+                    if (snapshots.hasData) {
+                      return GridView.builder(
+                        padding: const EdgeInsets.only(left: 5, right: 5),
+                        physics: const BouncingScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: snapshots.data!.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          childAspectRatio: .70,
+                          crossAxisCount: 3,
                         ),
-                        Text("2023-05-24")
-                      ],
-                    ),
-                  );
-                },
-              ),
+                        itemBuilder: (BuildContext context, int index) {
+                          return Card(
+                            color: Colors.grey.shade300,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => ImageSeen(
+                                                  imgUrl: snapshots
+                                                      .data![index].pictureUrl
+                                                      .toString(),
+                                                )));
+                                  },
+                                  child: Container(
+                                    height: 120,
+                                    decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        image: NetworkImage(snapshots
+                                            .data![index].pictureUrl
+                                            .toString()),
+                                        fit: BoxFit.fill,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    //const Text("Date: "),
+                                    Text(snapshots.data![index].dateTime!
+                                        .substring(0, 10)
+                                        .toString()),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    //const Text("Time: "),
+                                    Text(snapshots.data![index].dateTime!
+                                        .substring(10, 19)
+                                        .toString())
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    } else {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                  })
             ],
           ),
         ),

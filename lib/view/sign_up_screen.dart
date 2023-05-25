@@ -6,7 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:student_management/model/sign_up_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:student_management/model/all_model.dart';
 import 'home_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -191,9 +192,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     bool result =
                         await InternetConnectionChecker().hasConnection;
                     if (result == true) {
+                      final SharedPreferences prefs = await SharedPreferences.getInstance();
                       await setImages();
                       var uniqueKeys =
                           "${_nameController.text.replaceAll(" ", "").toUpperCase()}_${_phoneController.text.substring(0, 5)}_${_emailController.text.substring(0, 4).toUpperCase()}";
+                      prefs.setString("uid", uniqueKeys);
+                      prefs.setString("name", _nameController.text);
+                      prefs.setString("email", _emailController.text);
+                      prefs.setString("institute", _instituteController.text);
+                      prefs.setString("phone", _phoneController.text);
+                      prefs.setString("img", _imageUrl.toString());
                       var model = SignUpModel(
                           studentName: _nameController.text,
                           studentContact: _phoneController.text,

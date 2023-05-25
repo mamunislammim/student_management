@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:student_management/controller/get_data_on_firebase.dart';
 import 'package:student_management/view/image_submit_screen.dart';
 import 'package:student_management/view/stdents_activity_screen.dart';
 
@@ -10,24 +12,66 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  String? uid;
+  String? name;
+  String? email;
+  String? phn;
+  String? institute;
+  String? img;
+  Future<void> getInfo() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    uid = prefs.getString('uid');
+    name = prefs.getString('name');
+    email = prefs.getString('email');
+    institute = prefs.getString('institute');
+    phn = prefs.getString('phone');
+    img = prefs.getString('img')!;
+    print("\n\n_____________ Umg : $img");
+    setState(() {});
+  }
+  @override
+  void initState() {
+    getInfo();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.blueGrey.shade400,
-          centerTitle: true,
-          title: const Text(
-            "Flutter Team",
-            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-          ),
+      appBar: AppBar(
+        backgroundColor: Colors.blueGrey.shade400,
+        centerTitle: true,
+        title: const Text(
+          "Flutter Team",
+          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
         ),
-        endDrawer: Drawer(),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(5),
-          child: Column(
-            children: [
-              Card(
+      ),
+      endDrawer: Drawer(),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(5),
+        child: Column(
+          children: [
+            InkWell(
+              onTap: () {
+                GetAllData().getUserInfo();
+              },
+              child: Text("DSFDV"),
+            ),
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => StudentsActivityScreen(
+                              uid: uid.toString(),
+                              email: email.toString(),
+                              institute: institute.toString(),
+                              name: name.toString(),
+                              phn: phn.toString(), img: '',
+                            )));
+              },
+              child: Card(
                 color: Colors.blueGrey.shade200,
                 child: Row(
                   children: [
@@ -60,52 +104,110 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              const SizedBox(
-                height: 10,
-              ),
-              GridView.builder(
-                physics: const BouncingScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: 50,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 3.0,
-                    mainAxisSpacing: 3.0),
-                itemBuilder: (BuildContext context, int index) {
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const StudentsActivityScreen()));
-                    },
-                    child: Card(
-                      color: Colors.blueGrey.shade300,
-                      child: Center(
-                          child: CircleAvatar(
-                              backgroundColor: Colors.blueGrey.shade400,
-                              radius: 40,
-                              backgroundImage:
-                                  AssetImage('images/avater.png'))),
-                    ),
-                  );
-                },
-              ),
-            ],
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            FutureBuilder(
+                future: GetAllData().getUserInfo(),
+                builder: (_, snapshots) {
+                  if (snapshots.hasData) {
+                    return GridView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: snapshots.data!.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3, childAspectRatio: .85),
+                      itemBuilder: (BuildContext context, int index) {
+                        print(
+                            "______________________${snapshots.data!.length.toString()}");
+                        print("_________ Uid : $uid");
+                        print(
+                            "_________ Uid : ${snapshots.data![index].uniqueKey}");
+                        return uid?.toLowerCase() !=
+                                snapshots.data![index].uniqueKey
+                            ? GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              StudentsActivityScreen(
+                                                uid: snapshots
+                                                    .data![index].uniqueKey
+                                                    .toString(),
+                                                email: snapshots
+                                                    .data![index].email
+                                                    .toString(),
+                                                institute: snapshots
+                                                    .data![index].instituteName
+                                                    .toString(),
+                                                name: snapshots
+                                                    .data![index].studentName
+                                                    .toString(),
+                                                phn: snapshots
+                                                    .data![index].studentContact
+                                                    .toString(), img: snapshots.data![index].pictureUrl.toString(),
+                                              )));
+                                },
+                                child: Card(
+                                  color: Colors.blueGrey.shade300,
+                                  child: Column(
+                                    children: [
+                                      Center(
+                                          child: CircleAvatar(
+                                              backgroundColor:
+                                                  Colors.blueGrey.shade400,
+                                              radius: 40,
+                                              backgroundImage: AssetImage(
+                                                  'images/avater.png'))),
+                                      Card(
+                                        color: Colors.blueGrey.shade400,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Flexible(
+                                                child: Text(snapshots
+                                                    .data![index].studentName
+                                                    .toString())),
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : Text("DSFD");
+                      },
+                    );
+                  } else {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                })
+          ],
+        ),
+      ),
+      floatingActionButton: GestureDetector(
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const ImageSubmitScreen(
+                        uniqueKey: "AM",
+                      )));
+        },
+        child: const CircleAvatar(
+          radius: 30,
+          child: Icon(
+            Icons.add,
+            size: 30,
           ),
         ),
-        floatingActionButton: GestureDetector(
-          onTap: (){
-            Navigator.push(context, MaterialPageRoute(builder: (context)=> const ImageSubmitScreen(
-              uniqueKey: "AM",
-            )));
-          },
-          child: const CircleAvatar(
-            radius: 30,
-            child: Icon(Icons.add,size: 30,),
-          ),
-        ),
+      ),
     );
   }
 }

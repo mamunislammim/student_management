@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:student_management/model/sign_up_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:student_management/model/all_model.dart';
 
 class ImageSubmitScreen extends StatefulWidget {
   const ImageSubmitScreen({Key? key, this.uniqueKey}) : super(key: key);
@@ -15,6 +16,21 @@ class ImageSubmitScreen extends StatefulWidget {
 }
 
 class _ImageSubmitScreenState extends State<ImageSubmitScreen> {
+
+
+  String uid = "AM";
+  Future<void> getInfo() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    uid = prefs.getString('uid')!;
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    getInfo();
+    // TODO: implement initState
+    super.initState();
+  }
 
   XFile? image;
   Future<void> _imagePicker() async {
@@ -75,20 +91,22 @@ class _ImageSubmitScreenState extends State<ImageSubmitScreen> {
                             ),
                     ),
                   ),
-                image != null ? GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        image = null;
-                      });
-                    },
-                    child: Card(
-                        color: Colors.blueGrey.shade50,
-                        child: const Icon(
-                          Icons.close,
-                          size: 40,
-                          color: Colors.blueGrey,
-                        )),
-                  ) : SizedBox()
+                  image != null
+                      ? GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              image = null;
+                            });
+                          },
+                          child: Card(
+                              color: Colors.blueGrey.shade50,
+                              child: const Icon(
+                                Icons.close,
+                                size: 40,
+                                color: Colors.blueGrey,
+                              )),
+                        )
+                      : SizedBox()
                 ],
               ),
               Card(
@@ -113,11 +131,18 @@ class _ImageSubmitScreenState extends State<ImageSubmitScreen> {
                         //     .ref('Image_Submit')
                         //     .child(widget.uniqueKey.toString())
                         //     .set(model.toJson());
-                        var d = DateTime.now().toString().replaceAll(":", "").replaceAll(" ", "_").replaceAll("-", "").replaceAll(".", "").substring(0,15);
-                       print("__________d : $d");
+                        var d = DateTime.now()
+                            .toString()
+                            .replaceAll(":", "")
+                            .replaceAll(" ", "_")
+                            .replaceAll("-", "")
+                            .replaceAll(".", "")
+                            .substring(0, 15);
+                        print("__________d : $d");
                         await FirebaseDatabase.instance
                             .ref('Image_Submit')
-                            .child(widget.uniqueKey.toString()).child(d)
+                            .child(uid.toString())
+                            .child(d)
                             .set(model.toJson());
                         await EasyLoading.showSuccess("Success");
                         Navigator.pop(context);
