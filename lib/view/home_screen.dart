@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:student_management/view/image_submit_screen.dart';
 import 'package:student_management/view/stdents_activity_screen.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,7 +17,7 @@ class _HomePageState extends State<HomePage> {
         appBar: AppBar(
           backgroundColor: Colors.blueGrey.shade400,
           centerTitle: true,
-          title: Text(
+          title: const Text(
             "Flutter Team",
             style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
           ),
@@ -93,6 +94,18 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
-        ));
+        ),
+        floatingActionButton: GestureDetector(
+          onTap: (){
+            Navigator.push(context, MaterialPageRoute(builder: (context)=> const ImageSubmitScreen(
+              uniqueKey: "AM",
+            )));
+          },
+          child: const CircleAvatar(
+            radius: 30,
+            child: Icon(Icons.add,size: 30,),
+          ),
+        ),
+    );
   }
 }
