@@ -1,7 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:student_management/view/sign_up_screen.dart';
 import 'package:student_management/view/splash_screen.dart';
 
 import 'firebase_options.dart';

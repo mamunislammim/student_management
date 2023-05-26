@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:student_management/controller/get_data_on_firebase.dart';
 import 'package:student_management/view/image_submit_screen.dart';
 import 'package:student_management/view/stdents_activity_screen.dart';
+import 'package:student_management/widget/custom_drawer.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -29,6 +30,7 @@ class _HomePageState extends State<HomePage> {
     print("\n\n_____________ Umg : $img");
     setState(() {});
   }
+
   @override
   void initState() {
     getInfo();
@@ -47,17 +49,17 @@ class _HomePageState extends State<HomePage> {
           style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
         ),
       ),
-      endDrawer: Drawer(),
+      endDrawer:  CustomDrawer(name: name, phn: phn, img: img, email: email,),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(5),
         child: Column(
           children: [
-            InkWell(
-              onTap: () {
-                GetAllData().getUserInfo();
-              },
-              child: Text("DSFDV"),
-            ),
+            // InkWell(
+            //   onTap: () {
+            //     GetAllData().getUserInfo();
+            //   },
+            //   child: Text("DSFDV"),
+            // ),
             InkWell(
               onTap: () {
                 Navigator.push(
@@ -68,11 +70,12 @@ class _HomePageState extends State<HomePage> {
                               email: email.toString(),
                               institute: institute.toString(),
                               name: name.toString(),
-                              phn: phn.toString(), img: '',
+                              phn: phn.toString(),
+                              img: img.toString(),
                             )));
               },
               child: Card(
-                color: Colors.blueGrey.shade200,
+                color: Colors.blueGrey.shade300,
                 child: Row(
                   children: [
                     Padding(
@@ -118,7 +121,7 @@ class _HomePageState extends State<HomePage> {
                       itemCount: snapshots.data!.length,
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3, childAspectRatio: .85),
+                              crossAxisCount: 3, childAspectRatio: .95),
                       itemBuilder: (BuildContext context, int index) {
                         print(
                             "______________________${snapshots.data!.length.toString()}");
@@ -148,7 +151,10 @@ class _HomePageState extends State<HomePage> {
                                                     .toString(),
                                                 phn: snapshots
                                                     .data![index].studentContact
-                                                    .toString(), img: snapshots.data![index].pictureUrl.toString(),
+                                                    .toString(),
+                                                img: snapshots
+                                                    .data![index].pictureUrl
+                                                    .toString(),
                                               )));
                                 },
                                 child: Card(
@@ -169,9 +175,28 @@ class _HomePageState extends State<HomePage> {
                                               MainAxisAlignment.center,
                                           children: [
                                             Flexible(
+                                              child: snapshots.data![index]
+                                                          .studentName
+                                                          .toString()
+                                                          .length <
+                                                      10
+                                                  ? Padding(
+                                                      padding:
+                                                      const EdgeInsets.only(top: 5,bottom: 5),
                                                 child: Text(snapshots
-                                                    .data![index].studentName
-                                                    .toString())),
+                                                          .data![index]
+                                                          .studentName
+                                                          .toString()),
+                                                    )
+                                                  : Padding(
+                                                      padding:
+                                                      const EdgeInsets.only(top: 5,bottom: 5),
+                                                      child: Text(snapshots
+                                                          .data![index]
+                                                          .studentName!
+                                                          .substring(0, 12)),
+                                                    ),
+                                            ),
                                           ],
                                         ),
                                       )
@@ -179,7 +204,52 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                 ),
                               )
-                            : Text("DSFD");
+                            :    Card(
+                          color: Colors.blueGrey.shade300,
+                          child: Column(
+                            children: [
+                              Center(
+                                  child: CircleAvatar(
+                                      backgroundColor:
+                                      Colors.blueGrey.shade400,
+                                      radius: 40,
+                                      backgroundImage: AssetImage(
+                                          'images/avater.png'))),
+                              Card(
+                                color: Colors.blueGrey.shade400,
+                                child: Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.center,
+                                  children: [
+                                    Flexible(
+                                      child: snapshots.data![index]
+                                          .studentName
+                                          .toString()
+                                          .length <
+                                          10
+                                          ? Padding(
+                                        padding:
+                                        const EdgeInsets.only(top: 5,bottom: 5),
+                                        child: Text(snapshots
+                                            .data![index]
+                                            .studentName
+                                            .toString()),
+                                      )
+                                          : Padding(
+                                        padding:
+                                        const EdgeInsets.only(top: 5,bottom: 5),
+                                        child: Text(snapshots
+                                            .data![index]
+                                            .studentName!
+                                            .substring(0, 12)),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        );
                       },
                     );
                   } else {
@@ -196,15 +266,16 @@ class _HomePageState extends State<HomePage> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => const ImageSubmitScreen(
-                        uniqueKey: "AM",
+                  builder: (context) => ImageSubmitScreen(
+                        uniqueKey: uid.toString(),
                       )));
         },
         child: const CircleAvatar(
+          backgroundColor: Colors.blueGrey,
           radius: 30,
           child: Icon(
             Icons.add,
-            size: 30,
+            size: 45,
           ),
         ),
       ),

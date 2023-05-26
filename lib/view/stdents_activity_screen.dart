@@ -38,6 +38,8 @@ class _StudentsActivityScreenState extends State<StudentsActivityScreen> {
     phn = widget.phn;
      institute = widget.institute;
     img = widget.img;
+    print("\n--------Img : ${widget.img}");
+    print("\n--------Img : $img");
     setState(() {});
     super.initState();
   }

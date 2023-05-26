@@ -55,7 +55,11 @@ class _ImageSubmitScreenState extends State<ImageSubmitScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(),
+      backgroundColor: Colors.blueGrey.shade50,
+      appBar: AppBar(
+        title: const Text("Upload Your Design"),
+        backgroundColor: Colors.blueGrey,
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
